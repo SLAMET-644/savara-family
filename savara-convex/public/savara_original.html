@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SAVARA FAMILY — Member & Attendance</title>
+<style>
+:root{--bg:#090909;--card:#111;--card2:#171717;--red:#e00000;--red2:#ff3030;--text:#f5f5f5;--muted:#999;--line:#292929;--green:#20c878;--yellow:#ffc247}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#380000 0,#100000 25%,var(--bg) 52%);color:var(--text);font-family:Arial,sans-serif}
+header{padding:28px 18px 20px;text-align:center;border-bottom:1px solid #250000}
+.logo{font-weight:1000;letter-spacing:4px;font-size:27px}.sub{color:#aaa;font-size:12px;margin-top:6px;letter-spacing:2px}
+nav{display:flex;gap:8px;padding:12px;position:sticky;top:0;background:#090909ee;backdrop-filter:blur(12px);z-index:5;border-bottom:1px solid var(--line)}
+nav button{flex:1;padding:11px 5px;border:1px solid var(--line);background:#111;color:#aaa;border-radius:10px;font-weight:700}
+nav button.active{background:var(--red);border-color:var(--red);color:#fff}
+main{max-width:900px;margin:auto;padding:18px 14px 45px}.page{display:none}.page.active{display:block}
+.hero{padding:20px;border:1px solid #2b1111;border-radius:18px;background:linear-gradient(145deg,#171111,#0e0e0e);box-shadow:0 15px 45px #0008;margin-bottom:16px}
+.hero h1{margin:0 0 7px;font-size:25px}.hero p{margin:0;color:#aaa;font-size:13px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}.stat{background:#0b0b0b;border:1px solid var(--line);padding:13px;border-radius:12px}.stat b{display:block;font-size:22px}.stat span{color:#888;font-size:11px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:20px 2px 10px}.section-title h2{font-size:16px;margin:0}.pill{font-size:10px;padding:5px 8px;border-radius:99px;background:#250000;color:#ff7777}
+.list{display:grid;gap:9px}.person{display:flex;align-items:center;gap:12px;padding:13px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.avatar{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#250000;color:#ff5555;font-weight:900}.info{flex:1}.name{font-weight:800}.role{font-size:11px;color:#888;margin-top:3px}.status{font-size:11px;padding:7px 9px;border-radius:9px;background:#202020;color:#aaa}.hadir{background:#09271b;color:#50e39b}.belum{background:#2a210c;color:#ffd46a}.tidak{background:#2a0b0b;color:#ff7777}
+.actions{display:flex;gap:7px}.actions button,.primary,.danger{border:0;border-radius:9px;padding:9px 11px;font-weight:800;color:#fff;background:#242424}.primary{background:var(--red)}.danger{background:#451010}
+.toolbar{display:flex;gap:8px;margin-bottom:12px}.toolbar input{flex:1;background:#111;border:1px solid var(--line);color:#fff;padding:12px;border-radius:10px;outline:none}
+.empty{text-align:center;color:#777;padding:35px;border:1px dashed #333;border-radius:14px}
+footer{text-align:center;color:#666;font-size:11px;margin-top:25px}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:20;padding:18px;align-items:center;justify-content:center}.modal.show{display:flex}.box{width:min(450px,100%);background:#141414;border:1px solid #3a1515;border-radius:18px;padding:20px}.box h2{margin-top:0}.box input,.box select{width:100%;padding:12px;margin:6px 0 12px;border-radius:9px;border:1px solid #333;background:#0c0c0c;color:#fff}.box .row{display:flex;gap:8px}.box .row>*{flex:1}
+@media(min-width:700px){.list{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><div class="logo">SAVARA FAMILY</div><div class="sub">MEMBER MANAGEMENT • ATTENDANCE SYSTEM</div></header>
+<nav>
+<button class="active" onclick="show('home',this)">Dashboard</button>
+<button onclick="show('admins',this)">Admin</button>
+<button onclick="show('members',this)">Member</button>
+<button onclick="show('attendance',this)">Absen</button>
+</nav>
+<main>
+<section id="home" class="page active">
+<div class="hero"><h1>CONTROL CENTER</h1><p>Kelola admin, member, dan absensi SAVARA FAMILY dalam satu tempat.</p>
+<div class="stats"><div class="stat"><b id="sAdmins">0</b><span>ADMIN</span></div><div class="stat"><b id="sMembers">0</b><span>MEMBER</span></div><div class="stat"><b id="sPresent">0</b><span>HADIR HARI INI</span></div></div></div>
+<div class="section-title"><h2>Aturan Sistem</h2></div>
+<div class="person"><div class="avatar">A</div><div class="info"><div class="name">Absen Admin</div><div class="role">Status hadir reset otomatis setiap hari.</div></div><span class="status">HARIAN</span></div>
+<div class="person"><div class="avatar">M</div><div class="info"><div class="name">Absen Member</div><div class="role">Status absen reset otomatis setiap 7 hari.</div></div><span class="status">MINGGUAN</span></div>
+</section>
+
+<section id="admins" class="page">
+<div class="hero"><h1>🔴 DAFTAR ADMIN</h1><p>Data admin terpisah dari member. Status absen admin mengikuti siklus harian.</p></div>
+<div class="toolbar"><input id="aq" placeholder="Cari admin..." oninput="render()"><button class="primary" onclick="openModal('admin')">+ Tambah</button></div>
+<div id="adminList" class="list"></div>
+</section>
+
+<section id="members" class="page">
+<div class="hero"><h1>⚫ DAFTAR MEMBER</h1><p>Nama member tetap tersimpan. Hanya status absen yang diperbarui setiap minggu.</p></div>
+<div class="toolbar"><input id="mq" placeholder="Cari member..." oninput="render()"><button class="primary" onclick="openModal('member')">+ Tambah</button></div>
+<div id="memberList" class="list"></div>
+</section>
+
+<section id="attendance" class="page">
+<div class="hero"><h1>📋 ABSENSI</h1><p>Admin = harian • Member = mingguan. Klik status untuk mencatat kehadiran.</p></div>
+<div class="section-title"><h2>Absen Admin</h2><span class="pill">RESET HARIAN</span></div><div id="adminAtt" class="list"></div>
+<div class="section-title"><h2>Absen Member</h2><span class="pill">RESET 7 HARI</span></div><div id="memberAtt" class="list"></div>
+</section>
+<footer>SAVARA FAMILY • Sistem lokal demo. Untuk akses bersama, sambungkan ke database/hosting online.</footer>
+</main>
+
+<div id="modal" class="modal"><div class="box"><h2 id="mtitle">Tambah</h2><input id="nname" placeholder="Nama"><select id="nrole"><option value="Admin">Admin</option><option value="Member">Member</option></select><div class="row"><button class="danger" onclick="closeModal()">Batal</button><button class="primary" onclick="savePerson()">Simpan</button></div></div></div>
+<script>
+const KEY='savara_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{admins:[],members:[],adminCycle:'',memberCycle:''};
+let type='member',editIndex=-1;
+function cycle(){let d=new Date();return {day:d.toISOString().slice(0,10),week:new Date(d.getTime()-d.getDay()*86400000).toISOString().slice(0,10)}}
+function resetCycles(){let c=cycle();if(db.adminCycle!==c.day){db.admins.forEach(x=>x.status='Belum Absen');db.adminCycle=c.day}if(db.memberCycle!==c.week){db.members.forEach(x=>x.status='Belum Absen');db.memberCycle=c.week}save()}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
+function openModal(t,i=-1){type=t;editIndex=i;document.getElementById('mtitle').textContent=i<0?'Tambah '+t:'Edit '+t;let a=t==='admin'?db.admins:db.members;document.getElementById('nname').value=i<0?'':a[i].name;document.getElementById('nrole').value=t==='admin'?'Admin':'Member';document.getElementById('nrole').style.display='none';document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function savePerson(){let n=document.getElementById('nname').value.trim();if(!n)return;let a=type==='admin'?db.admins:db.members;if(editIndex<0)a.push({name:n,status:'Belum Absen'});else a[editIndex].name=n;save();closeModal();render()}
+function del(t,i){if(confirm('Hapus data ini?')){(t==='admin'?db.admins:db.members).splice(i,1);save();render()}}
+function toggle(t,i){let a=t==='admin'?db.admins:db.members;a[i].status=a[i].status==='Hadir'?'Belum Absen':'Hadir';save();render()}
+function person(p,t,i,att=false){let initials=p.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();return `<div class="person"><div class="avatar">${initials}</div><div class="info"><div class="name">${p.name}</div><div class="role">${t}</div></div><span class="status ${p.status==='Hadir'?'hadir':p.status==='Belum Absen'?'belum':'tidak'}">${p.status}</span>${att?`<button class="primary" onclick="toggle('${t.toLowerCase()}',${i})">${p.status==='Hadir'?'Batal':'Absen'}</button>`:`<div class="actions"><button onclick="openModal('${t.toLowerCase()}',${i})">Edit</button><button class="danger" onclick="del('${t.toLowerCase()}',${i})">×</button></div>`}</div>`}
+function render(){resetCycles();document.getElementById('sAdmins').textContent=db.admins.length;document.getElementById('sMembers').textContent=db.members.length;document.getElementById('sPresent').textContent=[...db.admins,...db.members].filter(x=>x.status==='Hadir').length;
+let aq=(document.getElementById('aq')?.value||'').toLowerCase(),mq=(document.getElementById('mq')?.value||'').toLowerCase();
+document.getElementById('adminList').innerHTML=db.admins.map((p,i)=>p.name.toLowerCase().includes(aq)?person(p,'Admin',i):'').join('')||'<div class="empty">Belum ada admin.</div>';
+document.getElementById('memberList').innerHTML=db.members.map((p,i)=>p.name.toLowerCase().includes(mq)?person(p,'Member',i):'').join('')||'<div class="empty">Belum ada member.</div>';
+document.getElementById('adminAtt').innerHTML=db.admins.map((p,i)=>person(p,'Admin',i,true)).join('')||'<div class="empty">Belum ada admin.</div>';
+document.getElementById('memberAtt').innerHTML=db.members.map((p,i)=>person(p,'Member',i,true)).join('')||'<div class="empty">Belum ada member.</div>';
+}
+render();
+</script>
+</body></html>

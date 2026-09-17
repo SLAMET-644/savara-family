@@ -1,0 +1,17 @@
+{
+  "name": "savara-family-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy"
+  },
+  "dependencies": {
+    "convex": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {}
+}
